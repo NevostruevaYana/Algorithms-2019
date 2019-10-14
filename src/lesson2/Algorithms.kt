@@ -2,6 +2,9 @@
 
 package lesson2
 
+import java.io.File
+import java.lang.Math.sqrt
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -94,8 +97,34 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
  */
+
+/**
+ * n = first.length; m = second.length
+ * Сложность по времени: O(n)(i-цикл) * O(m)(j-цикл) = O(m*n)
+ * Сложность по памяти: O(m*n)(хранение матрицы m*n)
+ */
+
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val count = Array(first.length + 1) { Array(second.length + 1) { 0 } }
+    var max = 0
+    var index = 0
+    val length1 = first.length - 1
+    val length2 = second.length - 1
+    for (i in 0..length1) {
+        for (j in 0..length2) {
+            if (first[i] == second[j]) {
+                count[i + 1][j + 1] = count[i][j] + 1
+                if (count[i + 1][j + 1] > max) {
+                    max = count[i + 1][j + 1]
+                    index = i
+                }
+            }
+        }
+    }
+    when (max) {
+        0 -> return ""
+        else -> return first.substring(index - max + 1, index + 1)
+    }
 }
 
 /**
@@ -108,8 +137,29 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
+
+/**
+ * n = limit
+ * Сложность по времени: O(n)(для внешнего i-цикла) * O(n^(0.5))(j-цикл) = O(n^(1.5))
+ * Сложность по памяти: O(1)(хранение limit, i, j, count, n)
+ */
+
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit <= 1) return 0
+    if (limit == 2) return 1
+    var count = 1
+    for (i in 3..limit step 2) {
+        if (isPrime(i)) count++
+    }
+    return count
+}
+
+fun isPrime(n: Int): Boolean {
+    for (j in 2..sqrt(n.toDouble()).toInt()) {
+        if (n % j == 0)
+            return false
+    }
+    return true
 }
 
 /**
@@ -138,6 +188,67 @@ fun calcPrimesNumber(limit: Int): Int {
  * В файле буквы разделены пробелами, строки -- переносами строк.
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
+
+/**
+ * Сложность по времени: O(n)(цикл перебора слов) * O(n)(i-цикл) * O(n)(j-цикл) = O(n^3)
+ * Сложность по памяти: O(n^2)(хранение мфтрицы) + O(n)(хранение конечного списка result)
+ *                      + O(1)(хранение константных переменных) = O(n^2)
+ */
+
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
-    TODO()
+    val matrix = File(inputName).bufferedReader().readLines().map {
+        if (!it.matches("([A-ZА-ЯЁ] )*[A-ZА-ЯЁ]".toRegex()))
+            throw IllegalArgumentException()
+        it.split(" ").map {
+            it.single()
+        }.toTypedArray()
+    }.toTypedArray()
+    val result = mutableListOf<String>()
+
+    val h = matrix.size - 1
+    val w = matrix[0].size - 1
+
+    for (word in words) {
+        for (i in 0..h) {
+            if (result.contains(word))
+                break
+            for (j in 0..w) {
+                val point = Point(i, j)
+                val check = mutableListOf<Point>()
+                if (finder(matrix, word, point, 0, check)) {
+                    result.add(word)
+                    break
+                }
+            }
+        }
+    }
+    return result.toSet()
+}
+
+data class Point(val x: Int, val y: Int)
+
+fun finder(matrix: Array<Array<Char>>, word: String, point: Point, index: Int, check: MutableList<Point>): Boolean {
+    val i = point.x
+    val j = point.y
+    if (word[index] != matrix[i][j])
+        return false
+    if (word.length - 1 == index)
+        return true
+    val points = mutableListOf<Point>()
+    check.add(point)
+    if (i != 0)
+        points.add(Point(i - 1, j))
+    if (i != matrix.size - 1)
+        points.add(Point(i + 1, j))
+    if (j != 0)
+        points.add(Point(i, j - 1))
+    if (j != matrix[0].size - 1)
+        points.add(Point(i, j + 1))
+    for (p in points) {
+        if (!check.contains(p)) {
+            if (finder(matrix, word, p, index + 1, check))
+                return true
+        }
+    }
+    return false
 }

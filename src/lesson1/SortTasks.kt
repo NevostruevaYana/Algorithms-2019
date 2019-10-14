@@ -2,6 +2,9 @@
 
 package lesson1
 
+import java.io.File
+import java.lang.IllegalArgumentException
+
 /**
  * Сортировка времён
  *
@@ -62,8 +65,34 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+/**
+ * m - количество адресов
+ * n - среднее количетво человек, проживающих по одному адресу
+ * Сложность по времени: O(n*m*logn*logm) (сложность sortedWith() - O(n*logn))
+ * Сложность по памяти: O(n*m)
+ */
+
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val output = HashMap<Pair<String, Int>, MutableList<Pair<String, String>>>()
+    File(inputName).bufferedReader().readLines().forEach {
+        if (!it.matches("\\S* \\S* - \\S* [1-9][0-9]*".toRegex()))
+            throw IllegalArgumentException()
+        val part = it.split("\\s-?\\s?".toRegex())
+        val address = Pair(part[2], part[3].toInt())
+        val person = Pair(part[0], part[1])
+        if (!output.containsKey(address))
+            output[address] = mutableListOf<Pair<String, String>>()
+        output[address]!!.add(person)
+    }
+    val bw = File(outputName).bufferedWriter()
+    output.keys.sortedWith(compareBy({ it.first }, { it.second })).forEach {
+        bw.write(it.first + " " + it.second + " - ")
+        val sortPersons = output[it]!!.sortedWith(compareBy({ it.first }, { it.second }))
+        bw.write(sortPersons.joinToString { "${it.first} ${it.second}" })
+        bw.newLine()
+    }
+    bw.close()
 }
 
 /**
@@ -96,8 +125,27 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+
+/**
+ * n - количество температур
+ * Сложность по времени: O(n) (сложность countingSort())
+ * Сложность по памяти: O(n)
+ */
+
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val posList = mutableListOf<Int>()
+    val negList = mutableListOf<Int>()
+    File(inputName).bufferedReader().readLines().forEach {
+        val temperature = (it.toFloat() * 10).toInt()
+        if (temperature >= 0)
+            posList.add(temperature)
+        else
+            negList.add(temperature * (-1))
+    }
+    File(outputName).writeText(countingSort(negList.toIntArray(),2730).reversedArray()
+        .joinToString("\n"){"-" + (it.toFloat()/10).toString()} + "\n" +
+            countingSort(posList.toIntArray(), 5000)
+                .joinToString("\n"){(it.toFloat()/10).toString()})
 }
 
 /**
@@ -129,8 +177,37 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
+
+/**
+ * n - количество чисел
+ * Сложность по времени: O(n)
+ * Сложность по памяти: O(2n) (хранение числа и количества его вхождений)
+ */
+
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val a = HashMap<Int, Int>()
+    File(inputName).bufferedReader().readLines().forEach {
+        if (!a.containsKey(it.toInt()))
+            a.put(it.toInt(), 0)
+        else
+            a[it.toInt()] = a[it.toInt()]!! + 1
+    }
+    val maxV = a.values.max()
+    var maxK = Int.MAX_VALUE
+    a.forEach {
+        if (it.value == maxV)
+            if (it.key < maxK)
+                maxK = it.key
+    }
+    val bw = File(outputName).bufferedWriter()
+    File(inputName).bufferedReader().readLines().forEach {
+        if (it.toInt() != maxK)
+            bw.write(it + "\n")
+    }
+    for (i in 1..maxV!!)
+        bw.write(maxK.toString() + "\n")
+    bw.write(maxK.toString())
+    bw.close()
 }
 
 /**
