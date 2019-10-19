@@ -73,23 +73,27 @@ fun sortTimes(inputName: String, outputName: String) {
  * Сложность по памяти: O(n*m)
  */
 
+data class Person(val name: String, val lastName: String)
+
+data class Address(val street: String, val num: Int)
+
 fun sortAddresses(inputName: String, outputName: String) {
-    val output = HashMap<Pair<String, Int>, MutableList<Pair<String, String>>>()
+    val output = HashMap<Address, MutableList<Person>>()
     File(inputName).bufferedReader().readLines().forEach {
         if (!it.matches("\\S* \\S* - \\S* [1-9][0-9]*".toRegex()))
             throw IllegalArgumentException()
         val part = it.split("\\s-?\\s?".toRegex())
-        val address = Pair(part[2], part[3].toInt())
-        val person = Pair(part[0], part[1])
+        val address = Address(part[2], part[3].toInt())
+        val person = Person(part[0], part[1])
         if (!output.containsKey(address))
-            output[address] = mutableListOf<Pair<String, String>>()
+            output[address] = mutableListOf<Person>()
         output[address]!!.add(person)
     }
     val bw = File(outputName).bufferedWriter()
-    output.keys.sortedWith(compareBy({ it.first }, { it.second })).forEach {
-        bw.write(it.first + " " + it.second + " - ")
-        val sortPersons = output[it]!!.sortedWith(compareBy({ it.first }, { it.second }))
-        bw.write(sortPersons.joinToString { "${it.first} ${it.second}" })
+    output.keys.sortedWith(compareBy({ it.street }, { it.num })).forEach {
+        bw.write(it.street + " " + it.num + " - ")
+        val sortPersons = output[it]!!.sortedWith(compareBy({ it.name }, { it.lastName }))
+        bw.write(sortPersons.joinToString { "${it.name} ${it.lastName}" })
         bw.newLine()
     }
     bw.close()
@@ -142,10 +146,11 @@ fun sortTemperatures(inputName: String, outputName: String) {
         else
             negList.add(temperature * (-1))
     }
-    File(outputName).writeText(countingSort(negList.toIntArray(),2730).reversedArray()
-        .joinToString("\n"){"-" + (it.toFloat()/10).toString()} + "\n" +
-            countingSort(posList.toIntArray(), 5000)
-                .joinToString("\n"){(it.toFloat()/10).toString()})
+    val posSort = countingSort(posList.toIntArray(), 5000)
+    val negSort = countingSort(negList.toIntArray(), 2730).reversedArray()
+    val posString = posSort.joinToString("\n") { (it.toFloat() / 10).toString()}
+    val negString = negSort.joinToString("\n"){"-" + (it.toFloat() / 10).toString()}
+    File(outputName).writeText(negString + "\n" + posString)
 }
 
 /**

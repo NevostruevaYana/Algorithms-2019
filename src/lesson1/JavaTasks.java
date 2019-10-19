@@ -1,6 +1,15 @@
 package lesson1;
 
 import kotlin.NotImplementedError;
+import kotlin.Pair;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.toBinaryString;
 
 @SuppressWarnings("unused")
 public class JavaTasks {

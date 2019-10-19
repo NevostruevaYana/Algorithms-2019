@@ -47,12 +47,12 @@ class AlgorithmsTestsKotlin : AbstractAlgorithmsTests() {
     fun testBaldaSearcher() {
         baldaSearcher { inputName, words -> baldaSearcher(inputName, words) }
         assertEquals(setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ"), baldaSearcher(
-            "test/lesson2/baldaSearcherTest1", setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК")))
+            "input/baldaSearcherTest1", setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК")))
         assertEquals(setOf("SOFA", "BILD", "COUCH"), baldaSearcher(
-            "test/lesson2/baldaSearcherTest2", setOf("SOFA", "BIRD", "BILD", "COUCH", "SCHNH")))
+            "input/baldaSearcherTest2", setOf("SOFA", "BIRD", "BILD", "COUCH", "SCHNH")))
         assertEquals(setOf("SOFA", "SESSEL", "BILD", "COUCH", "LAMPE"), baldaSearcher(
-            "test/lesson2/baldaSearcherTest2", setOf("SOFA", "SESSEL", "BILD", "COUCH", "LAMPE")))
+            "input/baldaSearcherTest2", setOf("SOFA", "SESSEL", "BILD", "COUCH", "LAMPE")))
         assertEquals(setOf(), baldaSearcher(
-            "test/lesson2/baldaSearcherTest1", setOf("ТРАВВ", "КРАА", "РАК")))
+            "input/baldaSearcherTest1", setOf("ТРАВВ", "КРАА", "РАК")))
     }
 }
