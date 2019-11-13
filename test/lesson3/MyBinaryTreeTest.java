@@ -33,7 +33,6 @@ class MyBinaryTreeTest {
         intTree.remove(63);
         assertEquals(3, intTree.height());
         assertEquals(7, intTree.size());
-        System.out.println(intTree.checkInvariant());
     }
 
     @Test
