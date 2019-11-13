@@ -4,6 +4,7 @@ import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 // Attention: comparable supported but comparator is not
@@ -72,10 +73,58 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
      * Удаление элемента в дереве
      * Средняя
      */
+    /**
+     * Сложность по времени: O(n) (в худшем случае)
+     * Сложность по памяти: O(1) (хранение current узла и его родителя parent)
+     */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        T value = (T) o;
+        if (!contains(value))
+            return false;
+        Node<T> current = root;
+        Node<T> parent = root;
+        while (current.value != value) {
+            parent = current;
+            if (value.compareTo(current.value) < 0) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        if (current.left == null || current.right == null)
+            if (current.left == null) {
+                transfer(current, parent, current.right);
+            } else {
+                transfer(current, parent, current.left);
+            }
+        else {
+            Node<T> min = current.right;
+            Node<T> minParent = current;
+            while (min.left != null) {
+                minParent = min;
+                min = min.left;
+            }
+            if (min != current.right) {
+                minParent.left = min.right;
+                min.right = current.right;
+            }
+            min.left = current.left;
+            transfer(current, parent, min);
+        }
+        size--;
+        return true;
+    }
+
+    private void transfer(Node<T> current, Node<T> parent, Node<T> node) {
+        if (current == root)
+            root = node;
+        else {
+            if (parent.left == current)
+                parent.left = node;
+            else
+                parent.right = node;
+        }
     }
 
     @Override
@@ -108,28 +157,48 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
     public class BinaryTreeIterator implements Iterator<T> {
 
+        private Node<T> current;
+        private Stack<Node<T>> stack;
+
         private BinaryTreeIterator() {
-            // Добавьте сюда инициализацию, если она необходима
+            stack = new Stack<>();
+            push(root);
+        }
+
+        // изначально храним только всех левых потомков корня
+        private void push(Node<T> root) {
+            while (root != null) {
+                stack.push(root);
+                root = root.left;
+            }
         }
 
         /**
          * Проверка наличия следующего элемента
          * Средняя
          */
+        /**
+         * Сложность по времени: O(1) (проверка на пустоту)
+         * Сложность по памяти: O(1)
+         */
         @Override
         public boolean hasNext() {
-            // TODO
-            throw new NotImplementedError();
+            return !stack.empty();
         }
 
         /**
          * Поиск следующего элемента
          * Средняя
          */
+        /**
+         * Сложность по времени: O(n) (худший случай)
+         * Сложность по памяти: O(1)
+         */
         @Override
         public T next() {
-            // TODO
-            throw new NotImplementedError();
+            current = stack.pop();
+            push(current.right);
+            return current.value;
         }
 
         /**
@@ -165,11 +234,21 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
      * Для этой задачи нет тестов (есть только заготовка subSetTest), но её тоже можно решить и их написать
      * Очень сложная
      */
+    /**
+     * Сложность по времени: O(n) (итерируемся по всему дереву)
+     * Сложность по памяти: O(n) (в худшем случае)
+     */
     @NotNull
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        BinaryTreeIterator iterator = new BinaryTreeIterator();
+        SortedSet<T> subSet = new TreeSet<>();
+        while (iterator.hasNext()) {
+            T value = iterator.next();
+            if (value.compareTo(fromElement) >= 0 && value.compareTo(toElement) < 0)
+                subSet.add(value);
+        }
+        return  subSet;
     }
 
     /**
@@ -179,8 +258,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        return findT(toElement, true);
     }
 
     /**
@@ -190,8 +268,28 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        // TODO
-        throw new NotImplementedError();
+        return findT(fromElement, false);
+    }
+
+    /**
+     * Сложность по времени: O(n) (итерируемся по всему дереву)
+     * Сложность по памяти: O(n)
+     */
+    private SortedSet<T> findT(T element, boolean head) {
+        BinaryTreeIterator iterator = new BinaryTreeIterator();
+        SortedSet<T> headSet = new TreeSet<>();
+        SortedSet<T> tailSet = new TreeSet<>();
+        while (iterator.hasNext()) {
+            T value = iterator.next();
+            if (value.compareTo(element) >= 0)
+                headSet.add(value);
+            else
+                tailSet.add(value);
+        }
+        if (head) {
+            return headSet;
+        }
+        return  tailSet;
     }
 
     @Override
