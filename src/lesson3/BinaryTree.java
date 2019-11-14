@@ -103,8 +103,6 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @Override
     public boolean remove(Object o) {
         T value = (T) o;
-        if (!inRange(value))
-            throw new IllegalArgumentException();
         if (!contains(value))
             return false;
         Node<T> current = root;
@@ -256,7 +254,11 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     }
 
     /**
+     * Задания немного некорректны, что можно заметить при тестировании последних трех задач
+     *
      * Для этой задачи нет тестов (есть только заготовка subSetTest), но её тоже можно решить и их написать
+     * (Найти подмножество всех элементов меньше toElement и больших или равных fromElement, в созданное множество
+     * в дальнейшем не могут быть добавлены элементы, не входящие в задвнный начальными усливиями диапазон)
      * Очень сложная
      */
     /**
@@ -278,7 +280,8 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     }
 
     /**
-     * Найти множество всех элементов меньше заданного
+     * Найти множество всех элементов меньше заданного(, в созданное множество
+     * в дальнейшем не могут быть добавлены элементы, большие или раные заданному)
      * Сложная
      */
     @NotNull
@@ -295,7 +298,8 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     }
 
     /**
-     * Найти множество всех элементов больше или равных заданного
+     * Найти множество всех элементов больше или равных заданного(, в созданное множество
+     * в дальнейшем не могут быть добавлены элементы, меньшие заданного)
      * Сложная
      */
     @NotNull
