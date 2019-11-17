@@ -26,15 +26,80 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
     private int size = 0;
 
+    private BinaryTree<T> setBottomLineAndTopLine(T bottomLine, T topLine) {
+        BinaryTree<T> tree = new BinaryTree<>();
+        BinaryTreeIterator iterator = new BinaryTreeIterator();
+        while (iterator.hasNext()) {
+            T value = iterator.next();
+            if (value.compareTo(topLine) < 0 && value.compareTo(bottomLine) >= 0) {
+                tree.add(value);
+            }
+        }
+        tree.topLine = topLine;
+        tree.bottomLine = bottomLine;
+        sets.add(tree);
+        tree.setParent(this);
+        return tree;
+    }
+
+    private BinaryTree<T> setTopLine(T topLine) {
+        BinaryTree<T> tree = new BinaryTree<>();
+        BinaryTreeIterator iterator = new BinaryTreeIterator();
+        while (iterator.hasNext()) {
+            T value = iterator.next();
+            if (value.compareTo(topLine) < 0) {
+                tree.add(value);
+            }
+        }
+        tree.topLine = topLine;
+        sets.add(tree);
+        tree.setParent(this);
+        return tree;
+    }
+
+    private BinaryTree<T> setBottomLine(T bottomLine) {
+        BinaryTree<T> tree = new BinaryTree<>();
+        BinaryTreeIterator iterator = new BinaryTreeIterator();
+        while (iterator.hasNext()) {
+            T value = iterator.next();
+            if (value.compareTo(bottomLine) >= 0) {
+                tree.add(value);
+            }
+        }
+        tree.bottomLine = bottomLine;
+        sets.add(tree);
+        tree.setParent(this);
+        return tree;
+    }
+
+    private void setParent(BinaryTree<T> parent) {
+        this.parent = parent;
+    }
+
     // для контроля добавления элементов в последних задачах
+    private BinaryTree<T> parent = null;
     private T topLine = null;
     private T bottomLine = null;
+    private List<BinaryTree<T>> sets = new LinkedList<>();
 
     BinaryTree(){}
 
-    BinaryTree(T bottomLine, T topLine) {
-        this.bottomLine = bottomLine;
-        this.topLine = topLine;
+    private boolean compareWithTopAndBottom(T t){
+        if (topLine == null || bottomLine == null)
+            return false;
+        return t.compareTo(topLine) < 0 && t.compareTo(bottomLine) >= 0;
+    }
+
+    private boolean compareWithTop(T t){
+        if (topLine == null)
+            return false;
+        return t.compareTo(topLine) < 0;
+    }
+
+    private boolean compareWithBottom(T t){
+        if (bottomLine == null)
+            return false;
+        return t.compareTo(bottomLine) >= 0;
     }
 
     private boolean inRange(T t) {
@@ -45,6 +110,18 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         if (topLine == null)
             return t.compareTo(bottomLine) >= 0;
         return t.compareTo(topLine) < 0 && t.compareTo(bottomLine) >= 0;
+    }
+
+    private int containsLine(){
+        if (topLine != null && bottomLine != null)
+            return 0;
+        else {
+            if (topLine == null)
+                return -1;
+            if (bottomLine == null)
+                return 1;
+        }
+        return -2;
     }
 
     @Override
@@ -67,6 +144,23 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         else {
             assert closest.right == null;
             closest.right = newNode;
+        }
+        if (parent != null) {
+            if (!parent.contains(t))
+                parent.add(t);
+        }
+        for (BinaryTree tree: sets) {
+            if (!tree.contains(t)) {
+                if (tree.containsLine() == 0)
+                if (tree.compareWithTopAndBottom(t))
+                    tree.add(t);
+                if (tree.containsLine() == 1)
+                if (tree.compareWithTop(t))
+                    tree.add(t);
+                if (tree.containsLine() == -1)
+                if (tree.compareWithBottom(t))
+                    tree.add(t);
+            }
         }
         size++;
         return true;
@@ -267,14 +361,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        BinaryTreeIterator iterator = new BinaryTreeIterator();
-        BinaryTree<T> subSet = new BinaryTree<>(fromElement, toElement);
-        while (iterator.hasNext()) {
-            T value = iterator.next();
-            if (value.compareTo(fromElement) >= 0 && value.compareTo(toElement) < 0)
-                subSet.add(value);
-        }
-        return subSet;
+        return this.setBottomLineAndTopLine(fromElement, toElement);
     }
 
     /**
@@ -285,14 +372,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        BinaryTreeIterator iterator = new BinaryTreeIterator();
-        BinaryTree<T> tailSet = new BinaryTree<>(null, toElement);
-        while (iterator.hasNext()) {
-            T value = iterator.next();
-            if (value.compareTo(toElement) < 0)
-                tailSet.add(value);
-        }
-        return tailSet;
+        return this.setTopLine(toElement);
     }
 
     /**
@@ -303,14 +383,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        BinaryTreeIterator iterator = new BinaryTreeIterator();
-        BinaryTree<T> tailSet = new BinaryTree<>(fromElement, null);
-        while (iterator.hasNext()) {
-            T value = iterator.next();
-            if (value.compareTo(fromElement) >= 0)
-                tailSet.add(value);
-        }
-        return tailSet;
+        return this.setBottomLine(fromElement);
     }
 
     @Override
