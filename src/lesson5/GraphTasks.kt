@@ -94,6 +94,7 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
     TODO()
 }
 
+
 /**
  * Наидлиннейший простой путь.
  * Сложная

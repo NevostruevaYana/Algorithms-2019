@@ -2,6 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -34,9 +35,9 @@ public class JavaDynamicTasks {
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
-    public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
+    public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {throw new NotImplementedError();
     }
+
 
     /**
      * Самый короткий маршрут на прямоугольном поле.
